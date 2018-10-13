@@ -13,6 +13,8 @@ std::map<std::string, CASC_FIND_DATA> CASCFiles;
 // Extracts CASC files, included split up entries
 void ExtractFile(const std::string ResultingFile, CASC_FIND_DATA CASCFindData, HANDLE StorageHandle)
 {
+	// Info
+	printf("> Extracting: %s\n", CASCFindData.szFileName);
 	// Bytes Read
 	DWORD BytesRead = 0;
 
@@ -24,9 +26,6 @@ void ExtractFile(const std::string ResultingFile, CASC_FIND_DATA CASCFindData, H
 	{
 		// Total File Size
 		uint64_t FileSize = CASCFindData.dwFileSize;
-
-		// Info
-		printf("> Extracting: %s\n", ResultingFile.c_str());
 
 		// Check file size (don't waste time with 0 size files)
 		if (FileSize == 0)
@@ -104,12 +103,10 @@ void ExtractFile(const std::string ResultingFile, CASC_FIND_DATA CASCFindData, H
 			CascCloseFile(FileHandle);
 
 			// Check for split files
-			for (uint8_t i = 2; i < SplitCount; i++)
+			for (uint8_t i = 0; i < SplitCount; i++)
 			{
 				// Sub File Path
-				auto SplitFilePath = Strings::Format("%s_%i", CASCFindData.szFileName, i);
-
-
+				auto SplitFilePath = Strings::Format("%s_%i", CASCFindData.szFileName, i + 2);
 
 				// Open the CASC file, skip if we failed
 				if (!CascOpenFile(StorageHandle, SplitFilePath.c_str(), CASC_LOCALE_ALL, 0, &FileHandle))
@@ -145,6 +142,8 @@ void ExtractFile(const std::string ResultingFile, CASC_FIND_DATA CASCFindData, H
 		}
 	}
 
+	// Info
+	printf("> Extracted to: %s\n", ResultingFile.c_str());
 	// Close all handles we created
 	_fcloseall();
 }
